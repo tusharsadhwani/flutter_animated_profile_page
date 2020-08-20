@@ -1,4 +1,5 @@
 import 'dart:math' show min, max;
+import 'dart:async' show Timer;
 
 import 'package:flutter/material.dart';
 
@@ -15,17 +16,63 @@ class _ProfilePageState extends State<ProfilePage> {
   final toolbarHeight = 56.0;
   final imgSize = 40.0;
 
+  final _scrollTolerance = 40.0;
+  bool _animating = false;
+  bool _open = true;
+  Timer _timer;
+
   double mapOffset(double start, double stop) {
     return map(_controller.offset, 0, _width, start, stop);
+  }
+
+  void handleProfilePicOpen() async {
+    if (_animating) return;
+
+    if (_timer != null) _timer.cancel();
+    _timer = Timer(Duration(milliseconds: 400), _resetPosition);
+
+    if (_open && _controller.offset > _scrollTolerance) {
+      _animating = true;
+      await _controller.animateTo(
+        _width,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOutQuad,
+      );
+      _open = false;
+      _animating = false;
+    } else if (!_open && _controller.offset < _width - _scrollTolerance) {
+      _animating = true;
+      await _controller.animateTo(
+        0,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOutQuad,
+      );
+      _open = true;
+      _animating = false;
+    }
+  }
+
+  void _resetPosition() {
+    if (_open) {
+      _controller.animateTo(
+        0,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOutQuad,
+      );
+    } else {
+      _controller.animateTo(
+        _width,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOutQuad,
+      );
+    }
   }
 
   @override
   void initState() {
     super.initState();
     _controller = ScrollController();
-    _controller.addListener(() {
-      print(_controller.offset);
-    });
+    _controller.addListener(handleProfilePicOpen);
   }
 
   @override
@@ -90,11 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (_, i) => ListTile(title: Text('$i')),
-            ),
-          )
+          SliverFillRemaining(),
         ],
       ),
     );

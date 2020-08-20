@@ -105,7 +105,6 @@ class MessageBox extends StatelessWidget {
           SizedBox(width: 12),
           Expanded(
             child: TextField(
-              autofocus: true,
               decoration: InputDecoration.collapsed(
                 hintText: 'Message',
               ),
