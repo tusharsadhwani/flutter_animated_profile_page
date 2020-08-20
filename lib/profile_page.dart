@@ -8,6 +8,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   ScrollController _controller;
   MediaQueryData _mediaQuery;
+  double _width;
 
   final toolbarHeight = 56.0;
 
@@ -24,6 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _mediaQuery = MediaQuery.of(context);
+    _width = _mediaQuery.size.width;
   }
 
   @override
@@ -35,39 +37,41 @@ class _ProfilePageState extends State<ProfilePage> {
           SliverAppBar(
             pinned: true,
             floating: true,
-            snap: true,
             toolbarHeight: toolbarHeight,
-            expandedHeight: _mediaQuery.size.width - _mediaQuery.padding.top,
+            expandedHeight: _width - _mediaQuery.padding.top,
             flexibleSpace: Align(
               alignment: Alignment.bottomCenter,
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    child: Hero(
-                      tag: 'pfp',
-                      child: Image.network(
-                        'https://picsum.photos/id/237/400/400',
-                        fit: BoxFit.fitWidth,
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) => Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Container(
+                      width: map(_controller.offset, 0, _width, _width, 40),
+                      child: Hero(
+                        tag: 'pfp',
+                        child: Image.network(
+                          'https://picsum.photos/id/237/400/400',
+                          fit: BoxFit.fitWidth,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: toolbarHeight,
-                    child: Row(
-                      children: [
-                        SizedBox(width: 70),
-                        SizedBox(width: 40),
-                        SizedBox(width: 10),
-                        Text(
-                          'Doggo',
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
-                      ],
+                    SizedBox(
+                      height: toolbarHeight,
+                      child: Row(
+                        children: [
+                          SizedBox(width: 70),
+                          SizedBox(width: 40),
+                          SizedBox(width: 10),
+                          Text(
+                            'Doggo',
+                            style: Theme.of(context).textTheme.headline6,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -76,4 +80,8 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+}
+
+double map(double x, double start1, double stop1, double start2, double stop2) {
+  return (x - start1) / (stop1 - start1) * (stop2 - start2) + start2;
 }
