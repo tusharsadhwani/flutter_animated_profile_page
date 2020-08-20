@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_profile/profile_page.dart';
+import 'package:flutter_animated_profile/profile_page.dart';
 
 class ChatPage extends StatelessWidget {
   @override
