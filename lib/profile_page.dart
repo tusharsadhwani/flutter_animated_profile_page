@@ -1,3 +1,5 @@
+import 'dart:math' show min, max;
+
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -41,7 +43,6 @@ class _ProfilePageState extends State<ProfilePage> {
         slivers: [
           SliverAppBar(
             pinned: true,
-            floating: true,
             toolbarHeight: toolbarHeight,
             expandedHeight: _width - _mediaQuery.padding.top,
             flexibleSpace: Align(
@@ -89,7 +90,11 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-          SliverFillRemaining(),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (_, i) => ListTile(title: Text('$i')),
+            ),
+          )
         ],
       ),
     );
@@ -97,5 +102,8 @@ class _ProfilePageState extends State<ProfilePage> {
 }
 
 double map(double x, double start1, double stop1, double start2, double stop2) {
-  return (x - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+  final val = (x - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+
+  if (start2 < stop2) return max(min(val, stop2), start2);
+  return max(min(val, start2), stop2);
 }
