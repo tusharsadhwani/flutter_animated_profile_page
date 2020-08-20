@@ -11,6 +11,11 @@ class _ProfilePageState extends State<ProfilePage> {
   double _width;
 
   final toolbarHeight = 56.0;
+  final imgSize = 40.0;
+
+  double mapOffset(double start, double stop) {
+    return map(_controller.offset, 0, _width, start, stop);
+  }
 
   @override
   void initState() {
@@ -44,15 +49,24 @@ class _ProfilePageState extends State<ProfilePage> {
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) => Stack(
-                  alignment: Alignment.bottomCenter,
+                  alignment: Alignment.bottomLeft,
+                  overflow: Overflow.visible,
                   children: [
-                    Container(
-                      width: map(_controller.offset, 0, _width, _width, 40),
-                      child: Hero(
-                        tag: 'pfp',
-                        child: Image.network(
-                          'https://picsum.photos/id/237/400/400',
-                          fit: BoxFit.fitWidth,
+                    Positioned(
+                      left: mapOffset(0, 60),
+                      bottom: mapOffset(0, (toolbarHeight - imgSize) / 2),
+                      child: Container(
+                        width: mapOffset(_width, 40),
+                        child: Hero(
+                          tag: 'pfp',
+                          child: ClipRRect(
+                            borderRadius:
+                                BorderRadius.circular(mapOffset(0, 40)),
+                            child: Image.network(
+                              'https://picsum.photos/id/237/400/400',
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -60,8 +74,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       height: toolbarHeight,
                       child: Row(
                         children: [
-                          SizedBox(width: 70),
-                          SizedBox(width: 40),
+                          SizedBox(width: 10),
+                          SizedBox(width: mapOffset(0, 50 + imgSize)),
                           SizedBox(width: 10),
                           Text(
                             'Doggo',
