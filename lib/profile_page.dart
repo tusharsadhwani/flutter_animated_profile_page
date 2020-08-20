@@ -9,6 +9,8 @@ class _ProfilePageState extends State<ProfilePage> {
   ScrollController _controller;
   MediaQueryData _mediaQuery;
 
+  final toolbarHeight = 56.0;
+
   @override
   void initState() {
     super.initState();
@@ -34,12 +36,12 @@ class _ProfilePageState extends State<ProfilePage> {
             pinned: true,
             floating: true,
             snap: true,
-            toolbarHeight: 56,
+            toolbarHeight: toolbarHeight,
             expandedHeight: _mediaQuery.size.width - _mediaQuery.padding.top,
             flexibleSpace: Align(
               alignment: Alignment.bottomCenter,
               child: Stack(
-                overflow: Overflow.visible,
+                alignment: Alignment.bottomCenter,
                 children: [
                   Container(
                     width: double.infinity,
@@ -51,17 +53,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      SizedBox(width: 70),
-                      SizedBox(width: 40, height: 62),
-                      SizedBox(width: 10),
-                      Text(
-                        'Doggo',
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                    ],
+                  SizedBox(
+                    height: toolbarHeight,
+                    child: Row(
+                      children: [
+                        SizedBox(width: 70),
+                        SizedBox(width: 40),
+                        SizedBox(width: 10),
+                        Text(
+                          'Doggo',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
