@@ -1,7 +1,7 @@
 import 'dart:math' show min, max;
-import 'dart:async' show Timer;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -16,10 +16,9 @@ class _ProfilePageState extends State<ProfilePage> {
   final toolbarHeight = 56.0;
   final imgSize = 40.0;
 
-  final _scrollTolerance = 40.0;
+  final _scrollTolerance = 60.0;
   bool _animating = false;
   bool _open = true;
-  Timer _timer;
 
   double mapOffset(double start, double stop) {
     return map(_controller.offset, 0, _width, start, stop);
@@ -28,26 +27,23 @@ class _ProfilePageState extends State<ProfilePage> {
   void handleProfilePicOpen() async {
     if (_animating) return;
 
-    if (_timer != null) _timer.cancel();
-    _timer = Timer(Duration(milliseconds: 400), _resetPosition);
-
     if (_open && _controller.offset > _scrollTolerance) {
       _animating = true;
+      _open = false;
       await _controller.animateTo(
         _width,
         duration: Duration(milliseconds: 300),
         curve: Curves.easeOutQuad,
       );
-      _open = false;
       _animating = false;
     } else if (!_open && _controller.offset < _width - _scrollTolerance) {
       _animating = true;
+      _open = true;
       await _controller.animateTo(
         0,
         duration: Duration(milliseconds: 300),
         curve: Curves.easeOutQuad,
       );
-      _open = true;
       _animating = false;
     }
   }
@@ -85,60 +81,69 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        controller: _controller,
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            toolbarHeight: toolbarHeight,
-            expandedHeight: _width - _mediaQuery.padding.top,
-            flexibleSpace: Align(
-              alignment: Alignment.bottomCenter,
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) => Stack(
-                  alignment: Alignment.bottomLeft,
-                  overflow: Overflow.visible,
-                  children: [
-                    Positioned(
-                      left: mapOffset(0, 60),
-                      bottom: mapOffset(0, (toolbarHeight - imgSize) / 2),
-                      child: Container(
-                        width: mapOffset(_width, 40),
-                        child: Hero(
-                          tag: 'pfp',
-                          child: ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(mapOffset(0, 40)),
-                            child: Image.network(
-                              'https://picsum.photos/id/237/400/400',
-                              fit: BoxFit.fitWidth,
+      body: NotificationListener<UserScrollNotification>(
+        onNotification: (notification) {
+          if (notification.direction == ScrollDirection.idle) {
+            _resetPosition();
+            return true;
+          }
+          return false;
+        },
+        child: CustomScrollView(
+          controller: _controller,
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              toolbarHeight: toolbarHeight,
+              expandedHeight: _width - _mediaQuery.padding.top,
+              flexibleSpace: Align(
+                alignment: Alignment.bottomCenter,
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) => Stack(
+                    alignment: Alignment.bottomLeft,
+                    overflow: Overflow.visible,
+                    children: [
+                      Positioned(
+                        left: mapOffset(0, 60),
+                        bottom: mapOffset(0, (toolbarHeight - imgSize) / 2),
+                        child: Container(
+                          width: mapOffset(_width, 40),
+                          child: Hero(
+                            tag: 'pfp',
+                            child: ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(mapOffset(0, 40)),
+                              child: Image.network(
+                                'https://picsum.photos/id/237/400/400',
+                                fit: BoxFit.fitWidth,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: toolbarHeight,
-                      child: Row(
-                        children: [
-                          SizedBox(width: 10),
-                          SizedBox(width: mapOffset(0, 50 + imgSize)),
-                          SizedBox(width: 10),
-                          Text(
-                            'Doggo',
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                        ],
+                      SizedBox(
+                        height: toolbarHeight,
+                        child: Row(
+                          children: [
+                            SizedBox(width: 10),
+                            SizedBox(width: mapOffset(0, 50 + imgSize)),
+                            SizedBox(width: 10),
+                            Text(
+                              'Doggo',
+                              style: Theme.of(context).textTheme.headline6,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          SliverFillRemaining(),
-        ],
+            SliverFillRemaining(),
+          ],
+        ),
       ),
     );
   }
